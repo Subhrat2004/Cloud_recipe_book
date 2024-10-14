@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Book</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        .recipe {
+            background-color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recipe Book</h1>
+    <form id="recipeForm">
+        <input type="text" id="name" placeholder="Recipe Name" required>
+        <textarea id="ingredients" placeholder="Ingredients (comma separated)" required></textarea>
+        <textarea id="steps" placeholder="Steps (comma separated)" required></textarea>
+        <button type="submit">Add Recipe</button>
+    </form>
+
+    <h2>All Recipes</h2>
+    <div id="recipes"></div>
+
+    <script>
+        const recipeForm = document.getElementById('recipeForm');
+        const recipesDiv = document.getElementById('recipes');
+
+        // Fetch all recipes on page load
+        async function fetchRecipes() {
+            const response = await fetch('https://your-api-endpoint/recipes'); // Update with your API endpoint
+            const recipes = await response.json();
+            recipesDiv.innerHTML = recipes.map(recipe => `
+                <div class="recipe">
+                    <h3>${recipe.name}</h3>
+                    <p><strong>Ingredients:</strong> ${recipe.ingredients.join(', ')}</p>
+                    <p><strong>Steps:</strong> ${recipe.steps.join(', ')}</p>
+                    <button onclick="deleteRecipe('${recipe._id}')">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        // Add a new recipe
+        recipeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const ingredients = document.getElementById('ingredients').value.split(',').map(i => i.trim());
+            const steps = document.getElementById('steps').value.split(',').map(s => s.trim());
+
+            const response = await fetch('https://your-api-endpoint/recipes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, ingredients, steps })
+            });
+
+            if (response.ok) {
+                fetchRecipes(); // Refresh the list of recipes
+                recipeForm.reset(); // Clear the form
+            } else {
+                alert('Failed to add recipe');
+            }
+        });
+
+        // Delete a recipe
+        async function deleteRecipe(id) {
+            const response = await fetch(`https://your-api-endpoint/recipes/${id}`, {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                fetchRecipes(); // Refresh the list of recipes
+            } else {
+                alert('Failed to delete recipe');
+            }
+        }
+
+        // Initial fetch of recipes
+        fetchRecipes();
+    </script>
+</body>
+</html>

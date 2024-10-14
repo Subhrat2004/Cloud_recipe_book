@@ -1,0 +1,19 @@
+/* src/App.css */
+.app {
+  text-align: center;
+}
+
+.add-recipe-button {
+  margin: 20px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-recipe-button:hover {
+  background-color: #45a049; /* Darker shade on hover */
+}
